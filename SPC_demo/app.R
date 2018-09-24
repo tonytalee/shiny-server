@@ -3,7 +3,6 @@ library(shinyjs)
 library(shinydashboard)
 library(grid)
 library(fitdistrplus)
-library(qqplotr)
 library(Rmisc)
 library(broom)
 library(plotly)
@@ -17,6 +16,7 @@ library(cowplot)
 library(lubridate)
 library(scales)
 library(ggplot2)
+library(qqplotr)
 library(tidyr)
 library(dplyr)
 library(stringr)
@@ -29,8 +29,8 @@ theme_set(theme_bw())
 tz <- "Asia/Taipei"
 Sys.setenv(TZ = tz)
 
-#dir <- "/srv/shiny-server/SPC_demo"
-dir <- "./"
+dir <- "/srv/shiny-server/SPC_demo"
+#dir <- "./"
 source(file.path(dir, "R_codes", "helpers.R"))
 load(file= file.path(dir, "Data", "data_demo.RData"))
 
