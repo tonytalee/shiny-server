@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1537193014383.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "417C2F40",
+    "lastKnownWriteTime" : 1537586181,
+    "last_content_update" : 1537586181627,
+    "path" : "~/Documents/shiny-server/SPC_demo/R_codes/helpers.R",
+    "project_path" : "R_codes/helpers.R",
+    "properties" : {
+        "cursorPosition" : "12,5",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

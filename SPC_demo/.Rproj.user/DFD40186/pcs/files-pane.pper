@@ -1,0 +1,9 @@
+{
+    "path" : "~/SightingData/shiny-server/SPC_demo",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
