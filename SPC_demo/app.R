@@ -29,8 +29,9 @@ theme_set(theme_bw())
 tz <- "Asia/Taipei"
 Sys.setenv(TZ = tz)
 
-dir <- "/srv/shiny-server/SPC_demo"
-#dir <- "./"
+
+#dir <- "/srv/shiny-server/SPC_demo"
+dir <- "./"
 source(file.path(dir, "R_codes", "helpers.R"))
 load(file= file.path(dir, "Data", "data_demo.RData"))
 
@@ -41,7 +42,8 @@ shinyApp(
 #=== UI =================================================================================
 ui = dashboardPage(
     # Dashboard head
-    dashboardHeader(disable = TRUE),
+    dashboardHeader(title = "DEMO of SPC and Process Capability Analysis",
+                    titleWidth = 450),
     
     # Dashboard sidebar
     dashboardSidebar(disable= TRUE), # sidebarMenu-dashboardSidbar
@@ -53,13 +55,6 @@ ui = dashboardPage(
             tags$link(rel = "stylesheet", type = "text/css", href = "custom.css"),
             tags$title("SPC demo")
         )),
-        
-        div(class= "header",
-            div(style= "display: inline-block;vertical-align: bottom;",
-                tags$img(src= "SightingData1.png")),
-            div(style= "display: inline-block;vertical-align: bottom; width:800px;",
-                "DEMO of SPC and Process Capability Analysis")
-        ),
         br(),
         fluidRow(
             column(width = 12, 
