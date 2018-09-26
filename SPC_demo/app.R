@@ -42,8 +42,7 @@ shinyApp(
 #=== UI =================================================================================
 ui = dashboardPage(
     # Dashboard head
-    dashboardHeader(title = "DEMO of SPC and Process Capability Analysis",
-                    titleWidth = 450),
+    dashboardHeader(disable = TRUE),
     
     # Dashboard sidebar
     dashboardSidebar(disable= TRUE), # sidebarMenu-dashboardSidbar
@@ -55,6 +54,18 @@ ui = dashboardPage(
             tags$link(rel = "stylesheet", type = "text/css", href = "custom.css"),
             tags$title("SPC demo")
         )),
+        
+        # Header
+        tags$div(
+            class= "header",
+            tags$div(
+                style= "display: inline-block;vertical-align:middle; width:100px;",
+                tags$img(src= "sightingdata.png")),
+            tags$div(
+                style= "display: inline-block;vertical-align:middle; width:800px;",
+                tags$h2("Demo of SPC and Process Capability Analysis"))
+        ),
+        
         br(),
         fluidRow(
             column(width = 12, 
