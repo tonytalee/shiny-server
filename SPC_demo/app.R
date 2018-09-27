@@ -60,7 +60,8 @@ ui = dashboardPage(
             class= "header",
             tags$div(
                 style= "display: inline-block;vertical-align:middle; width:100px;",
-                tags$img(src= "sightingdata.png")),
+                tags$a(href= "http://www.sightingdata.com", 
+                       tags$img(src= "sightingdata.png", alt= "Sighting Data"))),
             tags$div(
                 style= "display: inline-block;vertical-align:middle; width:800px;",
                 tags$h2("Demo of SPC and Process Capability Analysis"))
