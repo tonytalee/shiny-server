@@ -29,7 +29,6 @@ library(ProcessCapability)
 library(spcChart)
 library(qcc)
 library(outliers)
-library(car)
 library(pwr)
 
 addResourcePath("www", file.path("..", "www_eles"))

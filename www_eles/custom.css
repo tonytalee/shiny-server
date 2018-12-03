@@ -148,34 +148,34 @@
 }
 
 /* other css */
-.logo {
-    
-}
 .content-wrapper {
-    background-color: #FFFFFF
+    background-color: #F5F5F5
 }
 
 .well {
-    background-color: transparent;
+    background-color: #FFFFFF;
     border-color: steelblue;
-    margin: 5px
+    margin: 15px
 }
 
+/* tabPanel */
 .nav-tabs {
-    border-color: #218dcc;
+    border-color: transparent;
 }
 
-.nav-tabs > li > a {
-    color:#6a6868;
+
+.nav > li > a {
+    padding-bottom: 0px
 }
 
+/* Active tabPanel */
 .nav-tabs > li.active > a {
     font-weight: bold;
     color:#218dcc;
-    background-color: #FFF;
-    border-color: #218dcc;
-    border-bottom-color: transparent;
-    border-top-width: thick
+    background-color: #F5F5F5;
+    border-color: transparent;
+    border-bottom-color: #6B8E23;
+    border-bottom-width: medium
 }
 
 
@@ -188,6 +188,63 @@
     margin-left: 5px
 }
 
-.box {
-    box-shadow: none
+.btn-primary-15 {
+    color: white;
+    background-color: #4682B4;
+    padding-bottom: 15px;
+    padding-top: 15px;
+}
+
+
+.btn-primary {
+    color: white;
+    background-color: #4682B4;
+}
+
+.important {color: firebrick}
+
+.header {
+    background-color: #F2F2F2;
+    color: #36648B;
+    margin: -20px;
+    padding: 7px
+}
+
+.note {
+    color: #999999
+}
+
+/* Busy indicator */
+.btn-loading-container {
+    margin-left: 10px;
+    font-size: 1.2em;
+    }
+
+.btn-done-indicator {
+    color: green;
+}
+.btn-err {
+    margin-top: 10px;
+    color: red;
+}
+
+.fa-check-circle {
+    color: green;
+}
+
+.fa-times-circle {
+    color: red;
+}
+
+.fa-exclamation-triangle {
+    color: orange;
+}
+
+.fa-info-circle {
+    color: #218dcc;
+}
+
+.white {
+    border-top: 1px solid white;
+    margin-top: 5px
 }
