@@ -28,8 +28,8 @@ LotYield_pred <- function(this_day, proCtrl_summary) {
         group_by(Lot, Stage, Process_control_no, DTime) %>%
         summarise(Mean = mean(Value)) %>%
         as.data.frame(.) %>%
-        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, Chart_CLx,
-                            Chart_UCLx, Chart_LCLx), 
+        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, CLx,
+                            UCLx, LCLx), 
                   by= "Process_control_no") %>%
         mutate(Shift= (Mean - CS) / ((USL - LSL) / 2),
                QPC = 1 / (1 + K * abs(Shift)^alpha)) %>%
@@ -37,8 +37,8 @@ LotYield_pred <- function(this_day, proCtrl_summary) {
     
     performance_att <- lot_data %>%
         filter(ctrl %in% c("defect", "reject", "yield")) %>%
-        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, Chart_CLx,
-                            Chart_UCLx, Chart_LCLx), 
+        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, CLx,
+                            UCLx, LCLx), 
                   by= "Process_control_no") %>%
         mutate(Mean= Value, Shift = NA, QPC = 1 - Value / Size) %>%
         select(Lot, Stage, Process_control_no, QPC, DTime)
@@ -85,27 +85,27 @@ Baseline_QPC <- function(dbPath, start= NULL, end= NULL, proCtrl_summary) {
         group_by(Lot, Stage, Process_control_no) %>%
         summarise(Mean = mean(Value)) %>%
         as.data.frame(.) %>%
-        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, Chart_CLx,
-                            Chart_UCLx, Chart_LCLx), 
+        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, CLx,
+                            UCLx, LCLx), 
                   by= "Process_control_no") %>%
         mutate(Shift= (Mean - CS) / ((USL - LSL) / 2),
                QPC = 1 / (1 + K * abs(Shift)^alpha)) %>%
         select(Lot, Stage, Process_control_no, Mean, Shift, QPC, CS, USL, 
-               LSL, Chart_CLx, Chart_UCLx, Chart_LCLx)
+               LSL, CLx, UCLx, LCLx)
     
     performance_att <- lot_data %>%
         filter(ctrl %in% c("defect", "reject", "yield")) %>%
-        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, Chart_CLx,
-                            Chart_UCLx, Chart_LCLx), 
+        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, CLx,
+                            UCLx, LCLx), 
                   by= "Process_control_no") %>%
         mutate(Mean= Value, Shift = NA, QPC = 1 - Value / Size) %>%
         select(Lot, Stage, Process_control_no, Mean, Shift, QPC, CS, USL, 
-               LSL, Chart_CLx, Chart_UCLx, Chart_LCLx)
+               LSL, CLx, UCLx, LCLx)
     
     lot_performance <- bind_rows(performance_num, performance_att) 
     
     baselin_QPC <- lot_performance %>%
-        mutate(OOC= ifelse(Mean < Chart_LCLx | Mean > Chart_UCLx, "Yes", "No")) %>%
+        mutate(OOC= ifelse(Mean < LCLx | Mean > UCLx, "Yes", "No")) %>%
         filter(OOC == "No") %>%
         group_by(Process_control_no) %>%
         summarise(QPC_base = mean(QPC),
@@ -148,22 +148,22 @@ Get_lot_performance <- function(dbPath, id_YieldCat= NULL, proCtrl_summary) {
         group_by(Lot, Stage, Process_control_no) %>%
         summarise(Mean = mean(Value)) %>%
         as.data.frame(.) %>%
-        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, Chart_CLx,
-                            Chart_UCLx, Chart_LCLx), 
+        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, CLx,
+                            UCLx, LCLx), 
                   by= "Process_control_no") %>%
         mutate(Shift= (Mean - CS) / ((USL - LSL) / 2),
                QPC = 1 / (1 + K * abs(Shift)^alpha)) %>%
         select(Lot, Stage, Process_control_no, Mean, Shift, QPC, CS, USL, 
-               LSL, Chart_CLx, Chart_UCLx, Chart_LCLx)
+               LSL, CLx, UCLx, LCLx)
     
     performance_att <- lot_data %>%
         filter(ctrl %in% c("defect", "reject", "yield")) %>%
-        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, Chart_CLx,
-                            Chart_UCLx, Chart_LCLx), 
+        left_join(., select(proCtrl_summary, Process_control_no, CS, USL, LSL, CLx,
+                            UCLx, LCLx), 
                   by= "Process_control_no") %>%
         mutate(Mean= Value, Shift = NA, QPC = 1 - Value / Size) %>%
         select(Lot, Stage, Process_control_no, Mean, Shift, QPC, CS, USL, 
-               LSL, Chart_CLx, Chart_UCLx, Chart_LCLx)
+               LSL, CLx, UCLx, LCLx)
     
     lot_performance <- bind_rows(performance_num, performance_att) 
     
@@ -173,10 +173,10 @@ Get_lot_performance <- function(dbPath, id_YieldCat= NULL, proCtrl_summary) {
                   select(wip, Product, Lot, Stage, Recipe, Process_control_no, Start, 
                          End, Machine_id), 
                   by = c("Lot", "Stage", "Process_control_no")) %>%
-        mutate(OOC= ifelse(Mean < Chart_LCLx | Mean > Chart_UCLx, "Yes", "No"),
+        mutate(OOC= ifelse(Mean < LCLx | Mean > UCLx, "Yes", "No"),
                Start= ymd_hms(Start), End = ymd_hms(End)) %>%
         select(Lot, Product, Stage, Process_control_no, Yield, YieldCat, OOC, Mean, Shift, 
-               QPC, Machine_id, Chart_CLx, Chart_UCLx, Chart_LCLx, CS, USL, LSL, End) %>%
+               QPC, Machine_id, CLx, UCLx, LCLx, CS, USL, LSL, End) %>%
         arrange(Lot, End)
     lot_performance
 }

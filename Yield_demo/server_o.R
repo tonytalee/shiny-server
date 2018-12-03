@@ -15,7 +15,7 @@ shinyServer(function(input, output, session) {
         pre30day <- this_day - 30
         db <- dbConnect(RSQLite::SQLite(), file.path(dbPath, "Mfg.db"))
         yield_pre30days <- dbGetQuery(db, "SELECT * FROM Yield_lot
-                              WHERE Date >= :start AND Date <= :end",
+                                      WHERE Date >= :start AND Date <= :end",
                                       params = list(start = as.character(pre30day), 
                                                     end = as.character(this_day)))
         dbDisconnect(db)
@@ -109,7 +109,7 @@ shinyServer(function(input, output, session) {
                   colnames = names_col, class = "row-border") %>%
             formatPercentage("Yield", 1)
     })
-
+    
     output$dailyYield_OOC2lowYieldLot <- DT::renderDataTable({
         names_col <- c("OOC process controls",  "Not-low-yield lots", "Low-yield lots")
         ooc_ctrl <- ract_lotPerform_day() %>% filter(OOC == "Yes") %>%
@@ -258,19 +258,19 @@ shinyServer(function(input, output, session) {
         
         # SPC chart
         switch (Chart_type, 
-            "Xbar-R" = Xbar_R(dfx, x_var, y_var, info_var,  group_var, 
-                info_names= info_names, control_limits= pCtrl, xlab = "time"),
-            "Xbar-mR-R" = Xbar_mR_R(dfx, x_var, y_var, info_var,  group_var, 
-                info_names= info_names, control_limits= pCtrl, xlab = "time"),
-            "p" = p_chart(dfx, x_var, y_var, size_var, info_var, info_names= info_names, 
-                center_line= pCtrl$CLx, xlab= "time", ppm = TRUE),
-            "np" = p_chart(dfx, x_var, y_var, size_var, info_var, info_names= info_names, 
-                center_line= pCtrl$CLx, xlab= "time", np_chart= TRUE),
-            "u" = u_chart(dfx, x_var, y_var, size_var, iu, info_var, 
-                info_names= info_names, center_line = pCtrl$CLx, xlab = "time"),
-            "c" = u_chart(dfx, x_var, y_var, size_var, iu, info_var, 
-                info_names= info_names, center_line = pCtrl$CLx, xlab = "time", 
-                c_chart= TRUE)
+                "Xbar-R" = Xbar_R(dfx, x_var, y_var, info_var,  group_var, 
+                                  info_names= info_names, control_limits= pCtrl, xlab = "time"),
+                "Xbar-mR-R" = Xbar_mR_R(dfx, x_var, y_var, info_var,  group_var, 
+                                        info_names= info_names, control_limits= pCtrl, xlab = "time"),
+                "p" = p_chart(dfx, x_var, y_var, size_var, info_var, info_names= info_names, 
+                              center_line= pCtrl$CLx, xlab= "time", ppm = TRUE),
+                "np" = p_chart(dfx, x_var, y_var, size_var, info_var, info_names= info_names, 
+                               center_line= pCtrl$CLx, xlab= "time", np_chart= TRUE),
+                "u" = u_chart(dfx, x_var, y_var, size_var, iu, info_var, 
+                              info_names= info_names, center_line = pCtrl$CLx, xlab = "time"),
+                "c" = u_chart(dfx, x_var, y_var, size_var, iu, info_var, 
+                              info_names= info_names, center_line = pCtrl$CLx, xlab = "time", 
+                              c_chart= TRUE)
         )
     })
     
@@ -310,7 +310,7 @@ shinyServer(function(input, output, session) {
         
         db <- dbConnect(RSQLite::SQLite(), file.path(dbPath, "Mfg.db"))
         yield_5weeks <- dbGetQuery(db, "SELECT * FROM Yield_lot WHERE Week = :w",
-                                      params = list(w = (this_week - 4) : this_week)) %>% 
+                                   params = list(w = (this_week - 4) : this_week)) %>% 
             arrange(EndTime)
         dbDisconnect(db)
         
@@ -324,7 +324,7 @@ shinyServer(function(input, output, session) {
         
         # Add control limits to yield_5weeks
         yield_5weeks <- left_join(yield_5weeks, yield_ctrlLimits, 
-                                     by= c("Product" = "Process_control_no")) %>%
+                                  by= c("Product" = "Process_control_no")) %>%
             mutate(YieldCat = ifelse(Yield < LCLx , "Low", 
                                      ifelse(Yield > UCLx, "High", "Normal"))) %>%
             arrange(Product, EndTime)
@@ -516,7 +516,6 @@ shinyServer(function(input, output, session) {
         datatable(ooc_ctrl, rownames = FALSE,
                   colnames = names_col, class = "row-border",selection = "single")
     })
-    
 # END of 'shinyServer'
 })
 

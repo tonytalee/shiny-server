@@ -1,11 +1,135 @@
 
+#=== tabPanel: daily yield review =====
+tabPanel_dailyYieldReview <- tabPanel("Daily Yield Review",
+    fluidRow(
+        br(),
+        dateInput("yield_dailyDate",
+            label = "Date Input (yyyy-mm-dd)",
+            value = ymd("2018-02-27"),
+            min = "2018-02-01",
+            max = "2018-02-27"
+        )
+    ),
+    fluidRow(
+        box(title = "Daily Yield Summary", status = "primary", width = 5,
+            DT::dataTableOutput("dailyYield_yieldSummary") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        ),
+        box(title = "Batch Yield Distribution", status = "primary", width = 7,
+            plotlyOutput("dailyYield_lotDistribution") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        )
+    ),
+    fluidRow(
+        box(title = "Low-Yield Batches vs. Process Controls with OOC", status = "primary", 
+            width = 6,
+            DT::dataTableOutput("dailyYield_lowYieldLot2OOC") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        ),
+        box(title = "Process Controls with OOC vs. Low-Yield Batches", status = "primary",
+            width = 6,
+            DT::dataTableOutput("dailyYield_OOC2lowYieldLot") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        )
+    ),
+    hr(),
+    fluidRow(
+        box(title = "List of Batch Yield", status = "primary", 
+            width = 5,
+            selectInput("dailyYield_product", "Select Product",
+                        choices = c("All", products)),
+            br(),
+            DT::dataTableOutput("dailyYield_yieldTableByProd") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        ),
+        box(title = "Performance of Process Control", status = "primary", 
+            width = 7,
+            tableOutput("dailyYield_lotPerformance_head"),
+            DT::dataTableOutput("dailyYield_lotPerformance") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        )
+    ),
+    fluidRow(
+        box(title = "SPC Chart", status = "info",
+            width = 12,
+            h5(textOutput("dailyYield_spcChart_pCtrlNo")),
+            h5(textOutput("dailyYield_spcChart_timeSpan")),
+            plotlyOutput("dailyYield_spcChart", height = "500px") %>%
+                withSpinner(type= 4, color= "#6E8B3D"))
+    ),
+    fluidRow(
+        box(title = "Cross Analysis- boxplot", width = 10,
+            plotOutput("dailyYield_crossAnalysis_boxplot") %>%
+                withSpinner(type= 4, color= "#6E8B3D"))
+    )
+)
+
+#=== tabPanel: weekly yield review =====
+tabPanel_weeklyYieldReview <- tabPanel("Weekly Yield Review",
+    fluidRow(
+        br(),
+        selectInput("yieldWeekly_weekNo", "Select Week No.",
+                    choices = 4 : this_week, selected = this_week)
+    ),
+    fluidRow(
+        box(title = "Weekly Yield Summary", status = "primary", width = 5,
+            DT::dataTableOutput("weeklyYield_yieldSummary") %>%
+                withSpinner(type= 4, color= "#6E8B3D")) ,
+        box(title = "Batch Yield Distribution", status = "primary", width = 7,
+            plotOutput("weeklyYield_lotYieldDistribution") %>%
+                withSpinner(type= 4, color= "#6E8B3D"))
+    ),
+    fluidRow(
+        box(title = "Yield Trend, 5 Weeks", status = "primary", width = 12,
+            plotOutput("weeklyYield_yieldTrend") %>%
+                withSpinner(type= 4, color= "#6E8B3D"))
+    ),
+    fluidRow(
+        br(),
+        hr(),
+        h3("Test of Weekly Yield Drift"),
+        box(title = "Wilcoxon rank sum test on yield shift between this and last week", 
+            status = "primary", width = 4,
+            h5("Null hypothesis: true location shift is equal to  0"),
+            DT::dataTableOutput("weeklyYield_tb_yield_drift_2weeks") %>%
+                withSpinner(type= 4, color= "#6E8B3D")),
+        box(status = "primary", width = 8,
+            plotOutput("weeklyYield_plot_yield_drift_2weeks") %>%
+                withSpinner(type= 4, color= "#6E8B3D")),
+        box(title = "以 Wilcoxon rank sum test on yield shift between this week and 
+            the previous 4 weeks", 
+            status = "primary", width = 4,
+            h5("Null hypothesis: true location shift is equal to  0"),
+            DT::dataTableOutput("weeklyYield_tb_yield_drift_5weeks")),
+        box(status = "primary", width = 8,
+            plotOutput("weeklyYield_plot_yield_drift_5weeks") %>%
+                withSpinner(type= 4, color= "#6E8B3D")),
+        hr()
+    ),
+    fluidRow(
+        br(),
+        hr(),
+        h3("Effectiveness of Process Control for Yield"),
+        box(title = "Low-Yield Batches vs. Process Control with OOC", status = "primary", 
+            width = 5,
+            DT::dataTableOutput("weeklyYield_lowYieldLot2OOC") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        ),
+        box(title = "Process Control with OOC vs. Low-Yield Batches", status = "primary",
+            width = 5,
+            DT::dataTableOutput("weeklyYield_OOC2lowYieldLot") %>%
+                withSpinner(type= 4, color= "#6E8B3D")
+        )
+    )
+)
+
 #=== shiny UI ===========================================================================
 shinyUI(dashboardPage(
     # Dashboard head
     dashboardHeader(disable= TRUE),
     
     # Dashboard sidebar
-    dashboardSidebar(disable= TRUE), # sidebarMenu-dashboardSidbar
+    dashboardSidebar(disable= TRUE),
     
     # Dashboard body
     dashboardBody(
@@ -13,7 +137,7 @@ shinyUI(dashboardPage(
         # Link css
         tags$head(tagList(
             tags$link(rel = "stylesheet", type = "text/css", href = "www/custom.css"),
-            tags$title("Yield analysis demo")
+            tags$title("Demo of product yield analysis")
         )),
         
         # Header
@@ -25,75 +149,16 @@ shinyUI(dashboardPage(
                        tags$img(src= "www/sightingdata_logo_s.png", 
                                 alt= "Sighting Data"))),
             tags$div(
-                style= "display: inline-block;vertical-align:middle; width:400px;",
+                style= "display: inline-block;vertical-align:middle; width:600px;",
                 tags$h3(
-                    style= "font-family: American Typewriter",
-                    "Demo of Yield Analysis"))
+                    style = "font-family: American Typewriter",
+                    "Demo of Product Yield Analysis"))
         ),
         
-        fluidRow(
-            br(),
-            dateInput("yield_dailyDate",
-                      label = "Date Input (yyyy-mm-dd)",
-                      value = ymd("2018-02-23"),
-                      min = "2018-02-01",
-                      max = "2018-02-28"
-            )
-        ),
-        fluidRow(
-            h4("產品每日良率的總結及良率分佈"),
-            p("紅色線區間代表良率的正常範圍"),
-            box(title = "Daily Yield Summary", status = "primary", width = 5,
-                DT::dataTableOutput("dailyYield_yieldSummary")
-            ),
-            box(title = "Batch Yield Distribution", status = "primary", width = 7,
-                plotlyOutput("dailyYield_lotDistribution")
-            )
-        ),
-        hr(), br(),
-        fluidRow(
-            h4("產品良率跟製程管制的關聯"),
-            p("檢視低良率的批次是否已反應在某些製程管制項目上"),
-            box(title = "Low-Yield Batches vs. Process Controls with OOC", 
-                status = "primary", width = 6,
-                DT::dataTableOutput("dailyYield_lowYieldLot2OOC")
-            ),
-            box(title = "Process Controls with OOC vs. Low-Yield Batches", 
-                status = "primary", width = 6,
-                DT::dataTableOutput("dailyYield_OOC2lowYieldLot")
-            )
-        ),
-        hr(), br(),
-        fluidRow(
-            h4("檢視批次良率及其包含的管制項目的表現"),
-            p("點擊 'Lost of Batch Yield' 中的列以選擇批號來帶出該批次的管制項目的表現"),
-            box(title = "List of Batch Yield", status = "primary", 
-                width = 5,
-                selectInput("dailyYield_product", "Select Product",
-                            choices = c("All", products)),
-                br(),
-                DT::dataTableOutput("dailyYield_yieldTableByProd")
-            ),
-            box(title = "Performance of Process Control", status = "primary", 
-                width = 7,
-                tableOutput("dailyYield_lotPerformance_head"),
-                DT::dataTableOutput("dailyYield_lotPerformance")
-            )
-        ),
-        fluidRow(
-            h4("檢視該管制項目的 SPC 管制圖"),
-            p("顯示區間為該批次在該管制項目數據收集時間的前後三天"),
-            box(title = "SPC Chart", status = "primary", width = 12,
-                h5(textOutput("dailyYield_spcChart_pCtrlNo")),
-                h5(textOutput("dailyYield_spcChart_timeSpan")),
-                plotlyOutput("dailyYield_spcChart", height = "500px"))
-        ),
-        fluidRow(
-            h4("製程因子分析"),
-            box(title = "Cross Analysis- boxplot", status = "primary", width = 10,
-                plotOutput("dailyYield_crossAnalysis_boxplot")),
-            box(title = "Cross Analysis- 95% CI", status = "primary", width = 10,
-                plotOutput("dailyYield_crossAnalysis_CI"))
+        # tabItems group multiple tabItem
+        tabsetPanel(
+            tabPanel_dailyYieldReview,
+            tabPanel_weeklyYieldReview
         )
-    ) # tabItems-dashBoardBody
+    )
 )) # dashboardPage-shinyUI
