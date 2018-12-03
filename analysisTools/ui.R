@@ -633,8 +633,7 @@ compareMean <- tabItem(tabName = "compareMean",
     tabsetPanel(
         mean_oneSample,
         mean_twoSample,
-        mean_pairedSample,
-        mean_multiSample
+        mean_pairedSample
     )
 )
 
