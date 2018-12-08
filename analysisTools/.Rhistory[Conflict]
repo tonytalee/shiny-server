@@ -1,0 +1,512 @@
+#test = mean_test
+# type = c("one-sample", "two-sample", 'paired-sample")
+Parse_test <- function(test, power_test, type) {
+# set common values
+title = test$method
+nonpara_test <- str_split(title, " ")[[1]][1] %in% c("Wilcoxon", "Exact")
+t = round(test$statistic, 2)
+df = test$parameter
+p_value = round(test$p.value, 4)
+null_value = test$null.value
+alphax = power_test$sig.level
+icon <- icon("info-circle", "fa-2x")
+space <- paste(rep("&nbsp;", 5), collapse = "")
+# turn comparison result to sign of equal, not equal, ...
+if (test$p.value >= alphax) {
+h0 <- switch (power_test$alternative,
+"two.sided" = "=",
+"greater" = "&le;",
+"less" = "&ge;"
+)
+} else {
+h0 <- switch (power_test$alternative,
+"two.sided" = "&ne;",
+"greater" = ">",
+"less" = "<"
+)
+}
+# sentence for test result (accept or rejct) with icon of information
+result <- switch(type,
+"one-sample" = paste("Sample", names(test$null.value), h0,
+"Hypothesized",  names(test$null.value), sep= " "),
+"two-sample" = paste("Mean: &mu;1", h0, "&mu;2", sep= " "),
+"paired-sample" = paste("Mean of the differences", h0, "0", sep= " "),
+"one-prop" = paste("Sample proportion", h0,
+"Hypothesized proportion",sep = " "),
+"two-prop" = paste("Proportion: p1", h0, "p2")
+)
+line1 <- paste0("<p><b>", icon, "&nbsp;&nbsp;",  result, "</b></p>")
+#--- parse content of test result: p-value ...
+# line2: effect size (alarming if not reasonable)
+# line3: p-value and alpha
+# line4: power and effect size
+if (nonpara_test) {
+line2 <- NULL
+line3 <- paste0("<p>", space, "p-value = ", p_value,
+", significance level = ", alphax,"</p>")
+line4 <- NULL
+} else {
+line2 <- Info_effect(p_value, alphax, power_test$d)
+line3 <- paste0("<p>", space, "t = ", t, ", p-value = ", p_value,
+", significance level = ", alphax,"</p>")
+line4 <- paste0("<p>", space, "power = ", round(power_test$power, 3),
+", effect_size = ", round(power_test$d, 3),
+", degree of freedom = ", df, "</p>")
+}
+result <- paste0(line1, line2, "<div style= 'font-family:courier;'>",
+line3, line4, "</div>")
+# Return
+result
+}
+Parse_test(prop_test, power_test, type= "one-prop")
+power_test <- list(h = NULL, n = trial_c, sig.level = alpha, power = NULL,
+alternative = alt)
+Parse_test(prop_test, power_test, type= "one-prop")
+# Parse test result
+result <- Parse_test(prop_test, power_test, type= "one-prop")
+HTML(result)
+runApp()
+names(power_test)
+names(power_test)[1] <- "effect_size"
+power_test
+power_test <- pwr.p.test(h, n= trial_c, sig.level = alpha, alternative = alt)
+names(power_test)[1] <- "effect_size"
+power_test
+runApp()
+df <- data.frame(batch_id= paste0("B", 1:10),
+event_count= rbinom(10, 100, 0.025),
+sample_size= 100)
+View(df)
+getwd()
+write.csv(df, "./Raw/oneProp.csv", row.names = F)
+runApp()
+# * One-proportion test ----
+#... Input by summarized data
+event_c= 4; trial_c= 100; hypoProp= 0.03
+#... Check whether is large group
+nullHypo <- c("equal", "less", "greater")[1]
+alt <- switch (nullHypo,
+"equal" = "two.sided",
+"greater" = "less",
+"less" = "greater"
+)
+po <- event_c / trial_c
+large_sample <- ifelse(trial_c * po >= 5 & trial_c * (1 - po) >= 5, TRUE, FALSE)
+#... Perform one-poroportion test
+alpha <- 0.05
+test_method <- ifelse(large_sample, prop.test, binom.test)
+test_method
+test <- binom.test(event_c, trial_c, hypoProp, alternative = alt, conf.level = 1-alpha)
+test
+large_sample
+runApp()
+prop_test
+Plotly_ci_one(DF_ci(prop_test, one_estimate = TRUE),
+paste0((1 - alpha) * 100,
+"% confidence interval of sample proportion"),
+legend_name = c("sample proportion", "hypothesized proportion"))
+DF_ci(prop_test, one_estimate = TRUE)
+Plotly_ci_one(DF_ci(prop_test, one_estimate = TRUE), sd= NULL,
+paste0((1 - alpha) * 100,
+"% confidence interval of sample proportion"),
+legend_name = c("sample proportion", "hypothesized proportion"))
+Plotly_ci_one(DF_ci(prop_test, one_estimate = TRUE),
+"% confidence interval of sample proportion"),
+legend_name = c("sample proportion", "hypothesized proportion"))
+Plotly_ci_one(DF_ci(prop_test, one_estimate = TRUE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of sample proportion"),
+legend_name = c("sample proportion", "hypothesized proportion"))
+runApp()
+# * One-proportion test ----
+#... Input by summarized data
+event_c= 40; trial_c= 100; hypoProp= 0.03
+#... Check whether is large group
+nullHypo <- c("equal", "less", "greater")[1]
+alt <- switch (nullHypo,
+"equal" = "two.sided",
+"greater" = "less",
+"less" = "greater"
+)
+po <- event_c / trial_c
+large_sample <- ifelse(trial_c * po >= 5 & trial_c * (1 - po) >= 5, TRUE, FALSE)
+#... Perform one-poroportion test
+alpha <- 0.05
+test_method <- ifelse(large_sample, prop.test, binom.test)
+test <- binom.test(event_c, trial_c, hypoProp, alternative = alt, conf.level = 1-alpha)
+prop_test <- test_method(event_c, trial_c, p= hypoProp, correct = FALSE,
+alternative = alt, conf.level = 1-alpha)
+prop_test$statistic
+runApp()
+df <- data.frame(batch_id= paste0("B", 1:20),
+group= rep(c("control", "experiment"), each= 10),
+event_count= c(rbinom(10, 100, 0.085), rbinom(10, 100, 0.056)),
+sample_size= 100)
+write.csv(df, "./Raw/twoProp.csv", row.names = F)
+# * Two-proportion test -----
+event1 = 6; trial1 = 100; event2 = 8; trial2 = 97
+# perform two-proportion test
+alt <- "two.sided"
+alpha <- 0.05
+large_sample <- ifelse(event1 >= 5 & (trial1 - event1) >= 5 &
+event2 >=5 & (trial2 - event2) >=5,
+TRUE, FALSE)
+prop_test <- prop.test(x= c(event1, event2),
+n= c(trial1, trial2), alternative = alt,
+conf.level = 1 - alpha)
+prop_test
+Plotly_ci_one(DF_ci(prop_test, one_estimate= TRUE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of p1 - p2"),
+legend_name = c("p1 - p2", "0"),
+height = 150)
+Plotly_ci_one(DF_ci(prop_test, one_estimate= FALSE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of p1 - p2"),
+legend_name = c("p1 - p2", "0"),
+height = 150)
+DF_ci(prop_test, one_estimate= FALSE)
+prop_test
+test = prop_test
+estimate <- -1 * diff(test$estimate)
+df_ci <- data.frame(row.names= 1,
+estimate= estimate,
+low_ci= test$conf.int[1],
+up_ci= test$conf.int[2],
+fidu= test$null.value)
+estimate
+test$conf.int
+test$null.value
+matx <- matrix(c(event1, event2, trial1 - event1, trial2 - event2), nrow= 2)
+fisher.test(matx, alternative = alt, conf.level = 1 - alpha)
+prop_test <- fisher.test(matx, alternative = alt, conf.level = 1 - alpha)
+test
+if (is.null(test$null.value)) test$null.value <- 0
+test$null.value
+#---
+# Form data frame for ploting C.I.
+DF_ci <- function(test, one_estimate= TRUE) {
+if (one_estimate) {
+estimate <- test$estimate
+} else {
+estimate <- -1 * diff(test$estimate)
+}
+if (is.null(test$null.value)) test$null.value <- 0
+df_ci <- data.frame(row.names= 1,
+estimate= estimate,
+low_ci= test$conf.int[1],
+up_ci= test$conf.int[2],
+fidu= test$null.value)
+df_ci
+}
+Plotly_ci_one(DF_ci(prop_test, one_estimate= FALSE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of p1 - p2"),
+legend_name = c("p1 - p2", "0"),
+height = 150)
+DF_ci(prop_test, one_estimate= FALSE)
+df_ci <- data.frame(row.names= 1,
+estimate= estimate,
+low_ci= test$conf.int[1],
+up_ci= test$conf.int[2],
+fidu= test$null.value)
+df_ci
+#---
+# Form data frame for ploting C.I.
+DF_ci <- function(test, one_estimate= TRUE) {
+if (one_estimate) {
+estimate <- test$estimate
+} else {
+estimate <- -1 * diff(test$estimate)
+}
+if (is.null(test$null.value)) test$null.value <- 0
+df_ci <- data.frame(row.names= 1,
+estimate= estimate,
+low_ci= test$conf.int[1],
+up_ci= test$conf.int[2],
+fidu= test$null.value)
+df_ci
+}
+DF_ci(prop_test, one_estimate= FALSE)
+prop_test <- prop.test(x= c(event1, event2),
+n= c(trial1, trial2), alternative = alt,
+conf.level = 1 - alpha)
+Plotly_ci_one(DF_ci(prop_test, one_estimate= FALSE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of p1 - p2"),
+legend_name = c("p1 - p2", "0"),
+height = 150)
+prop_test
+test
+# power test
+p1 <- prop_test$estimate[1]
+p2 <- prop_test$estimate[2]
+h <- ES.h(p1, p2)
+pwr.p.test(h, n1= trial1, n2= trial2, sig.level = alpha,
+alternative = alt)
+pwr.2p2n.test(h, n1= trial1, n2= trial2, sig.level = alpha,
+alternative = alt)
+names(power_test)[1] <- "effect_size"
+power_test
+matx <- matrix(c(event1, event2, trial1 - event1, trial2 - event2), nrow= 2)
+prop_test <- fisher.test(matx, alternative = alt, conf.level = 1 - alpha)
+prop_test
+power_test <- pwr.2p2n.test(h, n1= trial1, n2= trial2, sig.level = alpha,
+alternative = alt)
+power_test
+names(power_test)[1] <- "effect_size"
+power_test
+Plotly_ci_one(DF_ci(prop_test, one_estimate = FALSE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of odds ratio"),
+legend_name = c("odds ratio", "1"))
+prop_test
+Plotly_ci_one(DF_ci(prop_test, one_estimate = TRUE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of odds ratio"),
+legend_name = c("odds ratio", "1"))
+test
+power_test
+# set common values
+title = test$method
+nonpara_test <- str_split(title, " ")[[1]][1] %in% c("Wilcoxon", "Exact", "Fisher's")
+nonpara_test
+stat = round(test$statistic, 2)
+stat
+df = test$parameter
+df
+p_value = round(test$p.value, 4)
+null_value = test$null.value
+test$null.value
+#null_value = test$null.value
+alphax = power_test$sig.level
+# Parse test result
+#test = mean_test
+# type = c("one-sample", "two-sample", 'paired-sample")
+Parse_test <- function(test, power_test, type) {
+# set common values
+title = test$method
+nonpara_test <- str_split(title, " ")[[1]][1] %in% c("Wilcoxon", "Exact", "Fisher's")
+stat = round(test$statistic, 2)
+df = test$parameter
+p_value = round(test$p.value, 4)
+#null_value = test$null.value
+alphax = power_test$sig.level
+icon <- icon("info-circle", "fa-2x")
+space <- paste(rep("&nbsp;", 5), collapse = "")
+# turn comparison result to sign of equal, not equal, ...
+if (test$p.value >= alphax) {
+h0 <- switch (power_test$alternative,
+"two.sided" = "=",
+"greater" = "&le;",
+"less" = "&ge;"
+)
+} else {
+h0 <- switch (power_test$alternative,
+"two.sided" = "&ne;",
+"greater" = ">",
+"less" = "<"
+)
+}
+# sentence for test result (accept or rejct) with icon of information
+result <- switch(type,
+"one-sample" = paste("Sample", names(test$null.value), h0,
+"Hypothesized",  names(test$null.value), sep= " "),
+"two-sample" = paste("Mean: &mu;1", h0, "&mu;2", sep= " "),
+"paired-sample" = paste("Mean of the differences", h0, "0", sep= " "),
+"one-prop" = paste("Sample proportion", h0,
+"Hypothesized proportion",sep = " "),
+"two-prop" = paste("Proportion: p1", h0, "p2")
+)
+line1 <- paste0("<p><b>", icon, "&nbsp;&nbsp;",  result, "</b></p>")
+#--- parse content of test result: p-value ...
+# line2: effect size (alarming if not reasonable)
+# line3: p-value and alpha
+# line4: power and effect size
+if (nonpara_test) {
+line2 <- NULL
+line3 <- paste0("<p>", space, "p-value = ", p_value,
+", significance level = ", alphax,"</p>")
+line4 <- NULL
+} else {
+typex <- switch (type,
+"one-sample" = "t",
+"two-sample" = "t",
+"paired-sample" = "t",
+"one-prop" = "p",
+"two-prop" = "p")
+line2 <- Info_effect(p_value, alphax, power_test$effect_size, typex)
+line3 <- paste0("<p>", space, names(stat), " = ", stat, ", p-value = ", p_value,
+", significance level = ", alphax,"</p>")
+line4 <- paste0("<p>", space, "power = ", round(power_test$power, 3),
+", effect_size = ", round(power_test$effect_size, 3),
+", degree of freedom = ", df, "</p>")
+}
+result <- paste0(line1, line2, "<div style= 'font-family:courier;'>",
+line3, line4, "</div>")
+# Return
+result
+}
+Parse_test(prop_test, power_test, type= "two-prop")
+prop_test
+test = prop_test
+# set common values
+title = test$method
+title
+nonpara_test <- str_split(title, " ")[[1]][1] %in% c("Wilcoxon", "Exact", "Fisher's")
+nonpara_test
+test$statistic
+# Parse test result
+#test = mean_test
+# type = c("one-sample", "two-sample", 'paired-sample")
+Parse_test <- function(test, power_test, type) {
+# set common values
+title = test$method
+nonpara_test <- str_split(title, " ")[[1]][1] %in% c("Wilcoxon", "Exact", "Fisher's")
+p_value = round(test$p.value, 4)
+#null_value = test$null.value
+alphax = power_test$sig.level
+icon <- icon("info-circle", "fa-2x")
+space <- paste(rep("&nbsp;", 5), collapse = "")
+# turn comparison result to sign of equal, not equal, ...
+if (test$p.value >= alphax) {
+h0 <- switch (power_test$alternative,
+"two.sided" = "=",
+"greater" = "&le;",
+"less" = "&ge;"
+)
+} else {
+h0 <- switch (power_test$alternative,
+"two.sided" = "&ne;",
+"greater" = ">",
+"less" = "<"
+)
+}
+# sentence for test result (accept or rejct) with icon of information
+result <- switch(type,
+"one-sample" = paste("Sample", names(test$null.value), h0,
+"Hypothesized",  names(test$null.value), sep= " "),
+"two-sample" = paste("Mean: &mu;1", h0, "&mu;2", sep= " "),
+"paired-sample" = paste("Mean of the differences", h0, "0", sep= " "),
+"one-prop" = paste("Sample proportion", h0,
+"Hypothesized proportion",sep = " "),
+"two-prop" = paste("Proportion: p1", h0, "p2")
+)
+line1 <- paste0("<p><b>", icon, "&nbsp;&nbsp;",  result, "</b></p>")
+#--- parse content of test result: p-value ...
+# line2: effect size (alarming if not reasonable)
+# line3: p-value and alpha
+# line4: power and effect size
+if (nonpara_test) {
+line2 <- NULL
+line3 <- paste0("<p>", space, "p-value = ", p_value,
+", significance level = ", alphax,"</p>")
+line4 <- NULL
+} else {
+stat = round(test$statistic, 2)
+dof = test$parameter
+typex <- switch (type,
+"one-sample" = "t",
+"two-sample" = "t",
+"paired-sample" = "t",
+"one-prop" = "p",
+"two-prop" = "p")
+line2 <- Info_effect(p_value, alphax, power_test$effect_size, typex)
+line3 <- paste0("<p>", space, names(stat), " = ", stat, ", p-value = ", p_value,
+", significance level = ", alphax,"</p>")
+line4 <- paste0("<p>", space, "power = ", round(power_test$power, 3),
+", effect_size = ", round(power_test$effect_size, 3),
+", degree of freedom = ", dof, "</p>")
+}
+result <- paste0(line1, line2, "<div style= 'font-family:courier;'>",
+line3, line4, "</div>")
+# Return
+result
+}
+Parse_test(prop_test, power_test, type= "two-prop")
+runApp()
+mat <- matrix(c(postNo, priNo, postYes, priYes), nrow= 2)
+# * Paired proportion test
+postNo = 1146; postYes = 37; priNo = 234; priYes = 17
+mat <- matrix(c(postNo, priNo, postYes, priYes), nrow= 2)
+mat
+mcnemar.test(mat, correct = FALSE)
+mcnemar.exact
+mcnemar.exact(mat)
+mat <- matrix(c(ntn, ytn, nty, yty), nrow= 2)
+# * Paired proportion test
+ntn = 1146; nty = 37; ytn = 234; yty = 17
+mat <- matrix(c(ntn, ytn, nty, yty), nrow= 2)
+mat
+mcnemar.test(mat, correct = FALSE)
+binom.test(c(nty, ytn), p= 0.5)
+alt = "two.sided"; alpha = 0.05
+binom.test(nty, ytn, hypoProp, alternative = alt, conf.level = 1-alpha)
+binom.test(c(nty, ytn,) 0.5, alternative = alt, conf.level = 1-alpha)
+binom.test(c(nty, ytn,), p= 0.5, alternative = alt, conf.level = 1-alpha)
+binom.test(c(nty, ytn), p= 0.5, alternative = alt, conf.level = 1-alpha)
+runApp()
+binom.test(c(nty, ytn), p= 0.5, alternative = "greater", conf.level = 1-alpha)
+runApp()
+# * Paired proportion test -----
+ntn = 1146; nty = 37; ytn = 234; yty = 17
+mat <- matrix(c(ntn, ytn, nty, yty), nrow= 2)
+mcnemar.test(mat, correct = FALSE)
+binom.test(c(nty, ytn), p= 0.5)
+alt = "two.sided"; alpha = 0.05
+prop_test <- binom.test(c(nty, ytn), p= 0.5, alternative = "greater", conf.level = 1-alpha)
+tz <- "Asia/Taipei"
+Sys.setenv(TZ = tz)
+source("global.R")
+source(file.path("rCode", "functions.R"))
+prop_test
+DF_ci(prop_test, one_estimate= TRUE)
+prop_test <- binom.test(c(nty, ytn), p= 0.5, alternative = "greater",
+conf.level = 1-alpha)
+prop_test
+prop_test <- binom.test(c(nty, ytn), p= 0.5, alternative = "two.sided", conf.level = 1-alpha)
+prop_test
+Plotly_ci_one(DF_ci(prop_test, one_estimate= TRUE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of sample proportion"),
+legend_name = c("sample proportion", "hypothesized proportion"),
+height = 150)
+shiny::runApp()
+# C.I. plot
+plot_ci <- Plotly_ci_one(DF_ci(prop_test, one_estimate= TRUE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of sample proportion"),
+legend_name = c("sample proportion", "hypothesized proportion"),
+height = 150)
+power_test <- list(effect_size = NULL, n = trial_c, sig.level = alpha,
+power = NULL, alternative = alt)
+power_test <- list(effect_size = NULL, n = NULL, sig.level = alpha,
+power = NULL, alternative = alt)
+# Parse test result
+result <- Parse_test(prop_test, power_test, type= "one-prop")
+result
+prop_test$method
+runApp()
+Plotly_ci_one(DF_ci(prop_test, one_estimate= TRUE),
+title = paste0((1 - alpha) * 100,
+"% confidence interval of probability of success"),
+legend_name = c("probability of success", "0.5"),
+height = 150)
+prop_test
+runApp()
+shiny::runApp()
+# use demo data
+dfo <- read_csv("./Raw/data1.csv")
+paste0("X", 1:6)
+runApp()
+# * Paired proportion test -----
+ntn = 1146; nty = 37; ytn = 234; yty = 17
+runApp()
+shiny::runApp()
+runApp()
+library(car)
+leveneTest
+shiny::runApp()
+runApp()
+shiny::runApp()
+runApp()
