@@ -86,8 +86,10 @@ shinyServer(function(input, output, session) {
             colsSel2 <- unlist(str_split(input$reviewData_assignNumCols, " "))
             
             if (length(colsSel2) == 0) return(
-                showModal(modalDialog(h3("At least one numeric column must be selected."),
-                                      footer = modalButton("OK"), easyClose = TRUE))
+                showModal(modalDialog(
+                    h3("Select a csv file for input and at least one numeric column must 
+                    be selected."), 
+                    footer = modalButton("OK"), easyClose = TRUE))
             )
             
             #... Set ID column
@@ -445,6 +447,14 @@ shinyServer(function(input, output, session) {
             updateNumericInput(session, "mean_oneSample_hyMean", value = hypoMean)
             
         } else {
+            if (is.null(rValue_dataSel$df)) {
+                return(
+                    showModal(modalDialog(
+                        h3("Select a csv file for input."), 
+                        footer = modalButton("OK"), easyClose = TRUE))
+                )
+            }
+            
             dfo <- rValue_dataSel$df
             colSel <- input$mean_oneSample_colSel
             hypoMean= input$mean_oneSample_hyMean
@@ -466,7 +476,10 @@ shinyServer(function(input, output, session) {
     
     # ** Outlier test
     output$mean_oneSample_outlierTest <- renderText({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         df <- ract_mean_oneSample_data()$df
+        
         alpha <- ract_mean_oneSample_data()$alphaOutlier
         
         out_test <- Grubbs_test(df[[1]], alpha = alpha)
@@ -492,7 +505,10 @@ shinyServer(function(input, output, session) {
     
     # ** Normality test
     ract_oneSampleNormaTest <- reactive({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         df <- ract_mean_oneSample_data()$df
+        
         alpha <- ract_mean_oneSample_data()$alphaNorma
         
         # Reurn a dataframe with subgroup, sample size, p value, and H0
@@ -500,6 +516,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_oneSample_normTest <- renderText({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         norm_test <- ract_oneSampleNormaTest()
         alpha <- ract_mean_oneSample_data()$alphaNorma
         
@@ -588,6 +606,8 @@ shinyServer(function(input, output, session) {
    
     # ** Plots ----
     output$mean_oneSample_p_box <- renderPlotly({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         df <- ract_mean_oneSample_data()$df
         
         Plotly_box(data.frame(x= "", y= df$value), name_vector = c("", ""), 
@@ -596,6 +616,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_oneSample_p_hist <- renderPlot({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         df <- ract_mean_oneSample_data()$df
         binwidth <- diff(range(df$value)) / (2 * IQR(df$value) / length(df$value)^(1/3))
         ggplot(df, aes(x= value)) + 
@@ -608,21 +630,29 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_oneSample_p_qq <- renderPlotly({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         df <- ract_mean_oneSample_data()$df
         QQ_plot(df$value)
     })
     
     # ** Output test result -----
     output$mean_oneSample_testTitle <- renderText({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         ract_oneSampleMeanTest()$test_title
     })
     
     output$mean_oneSample_meanTestResult <- renderText({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         ract_oneSampleMeanTest()$result
     })
     
     # dynamic ui for t-test
     output$mean_oneSample_ui_ci <- renderUI({
+        if (is.null(ract_mean_oneSample_data()$df)) return()
+        
         if (! is.null(ract_oneSampleMeanTest()$plot_ci)) {
             fluidRow(
                 plotlyOutput("mean_oneSample_p_ci", height = 255)
@@ -653,6 +683,14 @@ shinyServer(function(input, output, session) {
             dfo <- read_csv("./Raw/twoSampleMean.csv")
             colId= "sample_id"; colGroup = "group"; colValue = "value"
         } else {
+            if (is.null(rValue_dataSel$df)) {
+                return(
+                    showModal(modalDialog(
+                        h3("Select a csv file for input."), 
+                        footer = modalButton("OK"), easyClose = TRUE))
+                )
+            }
+            
             colId = input$mean_twoSample_colId
             colValue = input$mean_twoSample_colValue
             colGroup = input$mean_twoSample_colGroup
@@ -675,12 +713,16 @@ shinyServer(function(input, output, session) {
     
      # ** Outlier test ----
     ract_mean_twoSample_outlierTest <- reactive({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         df <- ract_mean_twoSample_data()$df
         alpha <- ract_mean_twoSample_data()$alphaOutlier
         
         Grubbs_test(df$value, df$group, alpha = alpha)
     })
     output$mean_twoSample_outlierTest <- renderText({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         out_test <- ract_mean_twoSample_outlierTest()
         
         if (prod(out_test$H0) == 1) {
@@ -699,6 +741,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_twoSample_tb_outlierTest <- renderDT({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         ract_mean_twoSample_outlierTest() %>%
             mutate(alpha= alpha) %>%
             select(group, p_value, alpha, outlier) %>%
@@ -707,6 +751,8 @@ shinyServer(function(input, output, session) {
     
     # ** Normality test ----
     ract_twoSampleNormaTest <- reactive({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         df <- ract_mean_twoSample_data()$df
         alpha <- ract_mean_twoSample_data()$alphaNorma
         
@@ -715,6 +761,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_twoSample_normTest <- renderText({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         norm_test <- ract_twoSampleNormaTest()
         
         if (prod(norm_test$H0) == 1) {
@@ -736,6 +784,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_twoSample_tb_normTest <- renderDT({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         norm_test <- ract_twoSampleNormaTest()
         alpha <- ract_mean_twoSample_data()$alphaNorma
         
@@ -748,6 +798,8 @@ shinyServer(function(input, output, session) {
     
     # ** Comparing variance
     ract_twoSampleVarTest <- reactive({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         df <- ract_mean_twoSample_data()$df
         normality <- ract_twoSampleNormaTest()$H0
         alpha <- ract_mean_twoSample_data()$alphaEqualVar
@@ -769,6 +821,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_twoSample_compareVar <- renderText({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         var_test <- ract_twoSampleVarTest()
         
         if (var_test$equalVar) {
@@ -791,6 +845,8 @@ shinyServer(function(input, output, session) {
     
     # ** Plots ----
     output$mean_twoSample_p_box <- renderPlotly({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         df <- ract_mean_twoSample_data()$df
         
         Plotly_box(select(df, group, value), 
@@ -802,6 +858,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_twoSample_p_dist <- renderPlot({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         df <- ract_mean_twoSample_data()$df
         ggplot(df, aes(x= value, fill= group, color= group)) + geom_density(alpha= 0.3) + 
             geom_hline(yintercept = 0, color= "#708090", size= 1) +
@@ -812,6 +870,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_twoSample_p_qq <- renderPlotly({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         df <- ract_mean_twoSample_data()$df
         
         QQ_plot(df$value, group = df$group, df_info = df$sample_id,  
@@ -822,6 +882,8 @@ shinyServer(function(input, output, session) {
     
     # ** Perform 2-sample test -----
     ract_twoSampleMeanTest <- reactive({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         testMethod <- input$mean_twoSample_testMethod
         nullHypo <- input$mean_twoSample_nullHypo
         
@@ -891,10 +953,14 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_twoSample_testTitle <- renderText({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         ract_twoSampleMeanTest()$test_title
     })
     
     output$mean_twoSample_meanTestResult <- renderText({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         ract_twoSampleMeanTest()$result
     })
     
@@ -907,6 +973,8 @@ shinyServer(function(input, output, session) {
         }
     })
     output$mean_twoSample_p_ci <- renderPlotly({
+        if (is.null(ract_mean_twoSample_data()$df)) return()
+        
         ract_twoSampleMeanTest()$plot_ci
     })
     
@@ -929,6 +997,14 @@ shinyServer(function(input, output, session) {
             dfo <- read_csv("./Raw/pairSampleMean.csv")
             colId = "sample_id"; colGroup = "group"; colValue = "value"
         } else {
+            if (is.null(rValue_dataSel$df)) {
+                return(
+                    showModal(modalDialog(
+                        h3("Select a csv file for input."), 
+                        footer = modalButton("OK"), easyClose = TRUE))
+                )
+            }
+            
             colId = input$mean_pairSample_colId
             colValue = input$mean_pairSample_colValue
             colGroup = input$mean_pairSample_colGroup
@@ -956,6 +1032,8 @@ shinyServer(function(input, output, session) {
     
     # ** Outlier test
      output$mean_pairSample_outlierTest <- renderText({
+         if (is.null(ract_mean_pairSample_data()$df)) return()
+         
         diff <- ract_mean_pairSample_data()$df_wide$diff
         alpha <- ract_mean_pairSample_data()$alphaOutlier
         
@@ -983,6 +1061,8 @@ shinyServer(function(input, output, session) {
     
     # ** Normality test
     ract_pairSampleNormaTest <- reactive({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         diff <- ract_mean_pairSample_data()$df_wide$diff
         alpha <- ract_mean_pairSample_data()$alphaNorma
         
@@ -991,6 +1071,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_pairSample_normTest <- renderText({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         norm_test <- ract_pairSampleNormaTest()
         alpha <- ract_mean_pairSample_data()$alphaNorma
         
@@ -1019,6 +1101,8 @@ shinyServer(function(input, output, session) {
     
     # ** Plots ----
     output$mean_pairSample_p_pair <- renderPlotly({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         df <- ract_mean_pairSample_data()$df
         Plotly_scatter(select(df, group, value),
                        xcolor = df$sample_id, 
@@ -1029,6 +1113,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_pairSample_p_dist <- renderPlot({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         df <- ract_mean_pairSample_data()$df
         ggplot(df, aes(x= value, fill= group, color= group)) + geom_density(alpha= 0.3) + 
             geom_hline(yintercept = 0, color= "#708090", size= 1) +
@@ -1039,12 +1125,16 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_pairSample_p_qq <- renderPlotly({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         df <- ract_mean_pairSample_data()$df
         QQ_plot(df$value, group = df$group, df_info = df$sample_id,  
             info_names = c("sample id"), colors = c("steelblue", "orangered3"))
     })
     
     output$mean_pairSample_p_diffBox <- renderPlotly({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         df <- ract_mean_pairSample_data()$df_wide
         
         Plotly_box(data.frame(x= "", y= df$diff), name_vector = c("", ""), 
@@ -1053,6 +1143,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_pairSample_p_diffDist <- renderPlot({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         df <- ract_mean_pairSample_data()$df_wide
         ggplot(df, aes(x= diff)) + 
             geom_histogram(color= "white", fill= "steelblue4", aes(y= ..density..)) + 
@@ -1063,6 +1155,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_pairSample_p_diffQQ <- renderPlotly({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
        df <- ract_mean_pairSample_data()$df_wide
        
        QQ_plot(df$diff)
@@ -1070,6 +1164,8 @@ shinyServer(function(input, output, session) {
     
     # ** Perform paired sample test -----
     ract_pairSampleMeanTest <- reactive({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         testMethod <- input$mean_pairSample_testMethod
         nullHypo <- input$mean_pairSample_nullHypo
         
@@ -1131,10 +1227,14 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_pairSample_testTitle <- renderText({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         ract_pairSampleMeanTest()$test_title
     })
     
     output$mean_pairSample_meanTestResult <- renderText({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         ract_pairSampleMeanTest()$result
     })
     
@@ -1148,6 +1248,8 @@ shinyServer(function(input, output, session) {
     })
     
     output$mean_pairSample_p_ci <- renderPlotly({
+        if (is.null(ract_mean_pairSample_data()$df)) return()
+        
         ract_pairSampleMeanTest()$plot_ci
     })
     
@@ -1256,6 +1358,14 @@ shinyServer(function(input, output, session) {
                 hypoProp <- input$oneProp_hyProp
                 df <- NULL
             } else {
+                if (is.null(rValue_dataSel$df)) {
+                    return(
+                        showModal(modalDialog(
+                            h3("Select a csv file for input."), 
+                            footer = modalButton("OK"), easyClose = TRUE))
+                    )
+                }
+                
                 df <- rValue_dataSel$df
 
                 # Confirm data is sbumitted.
@@ -1289,6 +1399,8 @@ shinyServer(function(input, output, session) {
     
     # Perform 1-proportion test and save result to ractive expression -----
     ract_oneProp_Test <- reactive({
+        if (is.null(ract_oneProp_data()$event_c)) return()
+        
         event_c <- ract_oneProp_data()$event_c
         trial_c <- ract_oneProp_data()$trial_c
         hypoProp <- ract_oneProp_data()$hypoProp
@@ -1540,6 +1652,14 @@ shinyServer(function(input, output, session) {
                     trial2 <- input$twoProp_countTrial_2
                     df <- NULL
                 } else {
+                    if (is.null(rValue_dataSel$df)) {
+                        return(
+                            showModal(modalDialog(
+                                h3("Select a csv file for input."), 
+                                footer = modalButton("OK"), easyClose = TRUE))
+                        )
+                    }
+                    
                     df <- rValue_dataSel$df
                     
                     # Confirm data is sbumitted.
@@ -1581,6 +1701,8 @@ shinyServer(function(input, output, session) {
     
     # ** Perform 2-proportion test and save result to ractive expression -----
     ract_twoProp_Test <- reactive({
+        if (is.null(ract_twoProp_data()$event1)) return()
+        
         event1 <- ract_twoProp_data()$event1
         trial1 <- ract_twoProp_data()$trial1
         event2 <- ract_twoProp_data()$event2
