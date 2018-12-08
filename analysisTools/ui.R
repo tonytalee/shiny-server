@@ -654,8 +654,8 @@ shinyUI(dashboardPage(title= "Basic Analysis Tool",
             tags$a(href="http://www.sightingdata.com",
                    tags$img(src="www/sightingdata_logo_s.png", height = '30'),
                    target="_blank"), 
-            "Basic Analysis Tool",
-            titleWidth = 280)
+            "Basic Analysis Tool"),
+        titleWidth = 250
     ),
     
     # Dashboard sidebar
