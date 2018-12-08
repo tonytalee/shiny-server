@@ -647,9 +647,16 @@ compareProp <- tabItem(tabName = "comparePorp",
 )
 
 #=== shiny UI ===========================================================================
-shinyUI(dashboardPage(
+shinyUI(dashboardPage(title= "Basic Analysis Tool",
     # Dashboard head
-    dashboardHeader(title = "Data Analysis Basic Tools", titleWidth = 250),
+    dashboardHeader(
+        title = tagList(
+            tags$a(href="http://www.sightingdata.com",
+                   tags$img(src="www/sightingdata_logo_s.png", height = '30'),
+                   target="_blank"), 
+            "Basic Analysis Tool",
+            titleWidth = 280)
+    ),
     
     # Dashboard sidebar
     dashboardSidebar(
