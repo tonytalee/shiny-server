@@ -16,7 +16,7 @@ withBusyIndicatorUI <- function(button) {
         span(
             class = "btn-loading-container",
             hidden(
-                img(src = "loading_circle.gif", class = "btn-loading-indicator"),
+                img(src = "www/loading_circle.gif", class = "btn-loading-indicator"),
                 icon("check", class = "btn-done-indicator")
             )
         ),

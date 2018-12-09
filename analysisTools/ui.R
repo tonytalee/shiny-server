@@ -654,8 +654,8 @@ shinyUI(dashboardPage(title= "Basic Analysis Tool",
             tags$a(href="http://www.sightingdata.com",
                    tags$img(src="www/sightingdata_logo_s.png", height = '30'),
                    target="_blank"), 
-            "Basic Analysis Tool"),
-        titleWidth = 250
+            HTML("<b style= 'margin-left: 10px'>Basic Analysis Tool</b>")),
+        titleWidth = 270
     ),
     
     # Dashboard sidebar
@@ -675,14 +675,28 @@ shinyUI(dashboardPage(title= "Basic Analysis Tool",
     # Dashboard body
     dashboardBody(
         useShinyjs(),
+        
         # Link css
-        tags$head(tags$link(rel = "stylesheet", type = "text/css", 
-                            href = "www/custom.css")),
+        tags$head(tagList(
+            tags$link(rel = "stylesheet", type = "text/css", href = "www/custom.css"),
+            tags$link(rel = "stylesheet", 
+                      href = "https://fonts.googleapis.com/css?family=Roboto+Slab:700")
+        )),
         
         tabItems(
             reviewData,
             compareMean,
             compareProp
+        ),
+        
+        # footer
+        div(id= "footer",
+            fluidRow(
+                hr(),
+                span(HTML("&copy;"), year(now()), " Design and Developed by ", 
+                     tags$a(href="http://www.sightingdata.com",
+                            "Sightingdata", target="_blank"))
+            )
         )
     ) # tabItems-dashBoardBody
 )) # dashboardPage-shinyUI

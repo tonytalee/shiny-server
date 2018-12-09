@@ -40,7 +40,10 @@
 .skin-blue .main-header .logo {
     background-color: #1C2539;
     color: #fff;
-    border-bottom: 0 solid transparent
+    border-bottom: 0 solid transparent;
+    text-align: left;
+    margin-left: 10px;
+    font-family: 'Roboto Slab', serif;
 }
 
 .skin-blue .main-header .logo:hover {
