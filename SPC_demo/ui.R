@@ -130,8 +130,7 @@ shinyUI(dashboardPage(title = "Demo of SPC review and process capability analysi
             tags$a(href="http://www.sightingdata.com",
                    tags$img(src="www/sightingdata_logo_s.png", height = '30'),
                    target="_blank"), 
-            HTML("<b style= 'margin-left: 10px'>Demo of SPC review and process capability
-                 analysis</b>")),
+            HTML("<b style= 'margin-left: 10px'>Demo of SPC review and process capability analysis</b>")),
         titleWidth = 600
     ),
     

@@ -44,6 +44,8 @@
     text-align: left;
     margin-left: 10px;
     font-family: 'Roboto Slab', serif;
+    font-size: 20px;
+    line-height: 50px;
 }
 
 .skin-blue .main-header .logo:hover {
