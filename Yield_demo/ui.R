@@ -124,9 +124,17 @@ tabPanel_weeklyYieldReview <- tabPanel("Weekly Yield Review",
 )
 
 #=== shiny UI ===========================================================================
-shinyUI(dashboardPage(
+shinyUI(dashboardPage(title = "Demo of product yield analysis",
     # Dashboard head
-    dashboardHeader(disable= TRUE),
+    # Dashboard head
+    dashboardHeader(
+        title = tagList(
+            tags$a(href="http://www.sightingdata.com",
+                   tags$img(src="www/sightingdata_logo_s.png", height = '30'),
+                   target="_blank"), 
+            HTML("<b style= 'margin-left: 10px'>Demo of Product Yield Analysis</b>")),
+        titleWidth = 400
+    ),
     
     # Dashboard sidebar
     dashboardSidebar(disable= TRUE),
@@ -137,28 +145,24 @@ shinyUI(dashboardPage(
         # Link css
         tags$head(tagList(
             tags$link(rel = "stylesheet", type = "text/css", href = "www/custom.css"),
-            tags$title("Demo of product yield analysis")
+            tags$link(rel = "stylesheet", 
+                      href = "https://fonts.googleapis.com/css?family=Roboto+Slab:700")
         )),
-        
-        # Header
-        tags$div(
-            class= "header",
-            tags$div(
-                style= "display: inline-block;vertical-align:middle; width:30px;",
-                tags$a(href= "http://www.sightingdata.com", 
-                       tags$img(src= "www/sightingdata_logo_s.png", 
-                                alt= "Sighting Data"))),
-            tags$div(
-                style= "display: inline-block;vertical-align:middle; width:600px;",
-                tags$h3(
-                    style = "font-family: American Typewriter",
-                    "Demo of Product Yield Analysis"))
-        ),
         
         # tabItems group multiple tabItem
         tabsetPanel(
             tabPanel_dailyYieldReview,
             tabPanel_weeklyYieldReview
+        ),
+        
+        # footer
+        div(id= "footer",
+            fluidRow(
+                hr(),
+                span(HTML("&copy;"), year(now()), " Design and Developed by ", 
+                     tags$a(href="http://www.sightingdata.com",
+                            "Sightingdata", target="_blank"))
+            )
         )
     )
 )) # dashboardPage-shinyUI
