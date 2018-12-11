@@ -26,9 +26,6 @@ reviewData <- tabItem(tabName = "reviewData",
     fluidRow( # Check duplicated rows -----
         h3("Step 2: check duplicated rows"),
         box(status = "primary", width = 12, collapsible = TRUE,
-            p(class= "note", "檢查是否有相同的資料列"),
-            p(icon("exclamation-triangle"), 
-              " 相同的資料列不一定是重複的資料，小心直接刪除！"),
             div(style= inlinestyle(190),
                 withBusyIndicatorUI(actionButton(
                     "reviewData_checkDupliData", "Check duplicated rows", 
@@ -50,8 +47,6 @@ reviewData <- tabItem(tabName = "reviewData",
     fluidRow( # Dealing with missing value -----
         h3("Step 3: dealing with missing value"),
         box(status = "primary", width = 12, collapsible = TRUE,
-            p(class= "note", "檢視遺失值，修正輸入資料；若要刪除含遺失值的列，按
-              'Remove rows with missing value'"),
             div(style= inlinestyle(190),
                 withBusyIndicatorUI(actionButton(
                     "reviewData_checkMissData", "Check missing value", 
@@ -74,7 +69,6 @@ reviewData <- tabItem(tabName = "reviewData",
         h3("Step 4: dealing with extreme value"),
         box(status = "primary", width = 12, collapsible = T,
             p(tags$b("Set criterion of extreme value")),
-            p(class= "note", "設定 IQR 倍數做為極端值界限"),
             div(style= inlinestyle(190),
                 numericInput("reviewData_extIQR", "Multiple of IQR as bound", 
                              value= 10, min= 1.5, width = 180)),
